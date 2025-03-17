@@ -28,89 +28,51 @@ const TaskCard = ({ task }: { task: Task }) => {
 
     return (
         <Card style={{ borderColor: statusColor, padding: 20}}>
-            {/*<Card.Header className='task-card-header'>*/}
-            {/*    <Row>*/}
-            {/*        <Col className='col-9 p-0'>*/}
-            {/*            <Row className="align-items-center justify-content-between">*/}
-            {/*                <Col className='p-0 col-5'>*/}
-            {/*                    <span>*/}
-            {/*                        <Button*/}
-            {/*                            className="level-btn"*/}
-            {/*                            style={{*/}
-            {/*                                '--bs-btn-border-color': priorityColor,  // Custom CSS variable*/}
-            {/*                                color: priorityColor,*/}
-            {/*                            } as React.CSSProperties}  // Cast to React.CSSProperties*/}
-            {/*                        >*/}
-            {/*                            <img*/}
-            {/*                                src={task.priority.icon}*/}
-            {/*                                alt={task.priority.name}*/}
-            {/*                                style={{ width: '16px', height:'18px', marginRight:'2px' }}*/}
-            {/*                            />*/}
-            {/*                            {task.priority.name}*/}
-            {/*                        </Button>*/}
-            {/*                    </span>*/}
-            {/*                </Col>*/}
-            {/*                <Col className='p-0 col-5'>*/}
-            {/*                  <span>*/}
-            {/*                        <Button*/}
-            {/*                            className="department-btn"*/}
-            {/*                            style={{*/}
-            {/*                                backgroundColor: departmentColor,*/}
-            {/*                                borderColor: departmentColor,*/}
-            {/*                            }}*/}
-            {/*                        >*/}
-            {/*                           {departmentShortName}*/}
-            {/*                        </Button>*/}
-            {/*                </span>*/}
-            {/*                </Col>*/}
-            {/*            </Row>*/}
-            {/*        </Col>*/}
-            {/*        <Col className='col-3 p-0'>*/}
-            {/*            <span>*/}
-            {/*                <h4 className='due-date'>{formattedDate}</h4>*/}
-            {/*            </span>*/}
-            {/*        </Col>*/}
-            {/*    </Row>*/}
-            {/*</Card.Header>*/}
-            <div className="task-card-header">
+            <Card.Header className='task-card-header'>
                 <Row>
-                    <Col className="col-8">
-                        <Row className="p-0">
-                            <Col className="p-0">
-                                 <Button
-                                      className="level-btn"
-                                                 style={{
-                                                       '--bs-btn-border-color': priorityColor,  // Custom CSS variable
-                                                                color: priorityColor,
-                                                      } as React.CSSProperties}  // Cast to React.CSSProperties
-                                                 >
-                                                 <img
-                                                       src={task.priority.icon}
-                                                       alt={task.priority.name}
-                                                       style={{ width: '16px', height:'18px', marginRight:'2px' }}
-                                                 />
-                                     {task.priority.name}
-                                 </Button>
+                    <Col className='col-9 p-0'>
+                        <Row className="align-items-center justify-content-between">
+                            <Col className='p-0 col-5'>
+                                <span>
+                                    <Button
+                                        className="level-btn"
+                                        style={{
+                                            '--bs-btn-border-color': priorityColor,  // Custom CSS variable
+                                            color: priorityColor,
+                                        } as React.CSSProperties}  // Cast to React.CSSProperties
+                                    >
+                                        <img
+                                            src={task.priority.icon}
+                                            alt={task.priority.name}
+                                            style={{ width: '16px', height:'18px', marginRight:'2px' }}
+                                        />
+                                        {task.priority.name}
+                                    </Button>
+                                </span>
                             </Col>
-                            <Col className="p-0">
-                                <Button
-                                    className="department-btn"
-                                    style={{
-                                        backgroundColor: departmentColor,
-                                        borderColor: departmentColor,
-                                    }}
-                                >
-                                    {departmentShortName}
-                                </Button>
+                            <Col className='p-0 col-5'>
+                              <span>
+                                    <Button
+                                        className="department-btn"
+                                        style={{
+                                            backgroundColor: departmentColor,
+                                            borderColor: departmentColor,
+                                        }}
+                                    >
+                                       {departmentShortName}
+                                    </Button>
+                            </span>
                             </Col>
                         </Row>
                     </Col>
-                    <Col className="col-3">
-                        <span className="due-date">22 იანვ,2025</span>
+                    <Col className='col-3 p-0'>
+                        <span>
+                            <h4 className='due-date'>{formattedDate}</h4>
+                        </span>
                     </Col>
                 </Row>
+            </Card.Header>
 
-            </div>
             <Card.Body className='task-card-body'>
                 <Card.Title>{task.name}</Card.Title>
                 <Card.Text>{task.description}</Card.Text>

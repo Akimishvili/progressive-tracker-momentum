@@ -53,13 +53,13 @@ const TaskList = () => {
                                 {status.name}
                             </Button>
 
-                            {/*{filteredTasks.length === 0 ? (*/}
-                            {/*    <p>ამ სტატუსში ამოცანები არ არის</p>*/}
-                            {/*) : (*/}
-                            {/*    filteredTasks.map((task) => (*/}
-                            {/*        <TaskCard key={task.id} task={task} />*/}
-                            {/*    ))*/}
-                            {/*)}*/}
+                            {filteredTasks.length === 0 ? (
+                                <p>ამ სტატუსში ამოცანები არ არის</p>
+                            ) : (
+                                filteredTasks.map((task) => (
+                                    <TaskCard key={task.id} task={task} />
+                                ))
+                            )}
                         </Col>
                     );
                 })}

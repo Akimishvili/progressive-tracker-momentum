@@ -3,6 +3,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
 import TaskDashboard from './pages/TaskDashboard';
+import TaskDetail from "./pages/TaskDetail.tsx";
 
 const App: React.FC = () => {
     return (
@@ -12,7 +13,8 @@ const App: React.FC = () => {
                 <Route path="/" element={<MainLayout />}>
                     {/* The default route renders TaskDashboard */}
                     <Route index element={<TaskDashboard />} />
-                    {/* You can add more nested routes here */}
+                    {/* The route renders TaskDetail */}
+                    <Route path="tasks/:taskId" element={<TaskDetail />} />
                 </Route>
             </Routes>
         </BrowserRouter>
