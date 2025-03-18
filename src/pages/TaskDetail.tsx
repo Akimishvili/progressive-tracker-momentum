@@ -10,7 +10,7 @@ import {
     departmentColors,
     departmentShortNames,
     priorityColors,
-} from "../services/config.tsx";
+} from "../services/config.ts";
 import { Task } from "../types/types.ts";
 import Image from "react-bootstrap/Image";
 import CommentsSection from "../components/comments/CommentsSection.tsx";

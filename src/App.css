@@ -212,3 +212,9 @@
   font-family: 'FiraGO';
   text-decoration: none;
 }
+
+.create-task-form-container{
+  border: 0.3px solid #DDD2FF;
+  background-color: #FBF9FFA6;
+  border-radius: 4px;
+}
