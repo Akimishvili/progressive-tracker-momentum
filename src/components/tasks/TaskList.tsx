@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Row, Col } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
-import {apiToken, baseURL, taskStatuses} from "../../services/config.tsx";
+import {apiToken, baseURL, taskStatuses} from "../../services/config.ts";
 import TaskCard from "./TaskCard.tsx";
 import { Task } from "../../types/types.ts";
 

@@ -2,7 +2,7 @@ import Card from 'react-bootstrap/Card';
 import { Col, Row } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import { Task } from "../../types/types.ts";
-import {departmentColors, departmentShortNames, priorityColors, statusColors} from "../../services/config.tsx";
+import {departmentColors, departmentShortNames, priorityColors, statusColors} from "../../services/config.ts";
 
 
 const TaskCard = ({ task }: { task: Task }) => {
