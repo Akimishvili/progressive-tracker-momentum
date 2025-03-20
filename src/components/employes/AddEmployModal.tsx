@@ -13,8 +13,8 @@ const AddEmployeeModal = ({ show, handleClose, handleSave }: ModalProps) =>  {
 
     const handleFormSubmit = (data: Employee) => {
         const formData = {
-            firstName: data.firstName,
-            lastName: data.lastName,
+            firstName: data.name,
+            lastName: data.surname,
             avatar,
             department_id: data.department_id
         };

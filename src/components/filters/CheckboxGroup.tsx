@@ -2,7 +2,7 @@ import React from 'react';
 import Form from 'react-bootstrap/Form';
 
 interface CheckboxGroupProps {
-  options: string[];
+  options: { name: string; surname: string; avatar: string }[] | string[];
   selected: string[];
   onChange: (option: string) => void;
 }
@@ -10,16 +10,27 @@ interface CheckboxGroupProps {
 const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ options, selected, onChange }) => {
   return (
       <Form>
-        {options.map((option: string, idx: number) => (
-            <Form.Check
-                key={idx}
-                type="checkbox"
-                label={option}
-                checked={selected.includes(option)}
-                onChange={() => onChange(option)}
-                className="mb-2"
-            />
-        ))}
+        {options.map((option, idx) => {
+
+          const label = typeof option === 'string' ? option : `${option.name} ${option.surname}`;
+          const avatar = typeof option === 'string' ? null : option.avatar;
+
+          return (
+              <Form.Check
+                  key={idx}
+                  type="checkbox"
+                  label={
+                    <div className="d-flex align-items-center">
+                      {avatar && <img src={avatar} alt={label} style={{ width: '30px', height: '30px', borderRadius: '50%', marginRight: '10px' }} />}
+                      {label}
+                    </div>
+                  }
+                  checked={selected.includes(label)}
+                  onChange={() => onChange(label)}
+                  className="mb-2 custom-checkbox"
+              />
+          );
+        })}
       </Form>
   );
 };

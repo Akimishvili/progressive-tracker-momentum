@@ -16,8 +16,9 @@ export interface Department {
 
 export interface Employee {
     id: number;
-    firstName: string;
-    lastName: string;
+    name: string;
+    surname: string;
+    avatar: string;
     department_id: number;
 }
 
@@ -30,6 +31,7 @@ export interface Task {
     priority: Priority;
     department: Department;
     employee: Employee;
+    total_comments: number
 }
 
 export interface ModalProps {
