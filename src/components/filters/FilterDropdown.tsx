@@ -1,15 +1,11 @@
+import { useState} from 'react';
+
 import Dropdown from 'react-bootstrap/Dropdown';
-import {ReactNode, useState} from 'react';
 import Button from "react-bootstrap/Button";
 
-interface FilterDropdownProps {
-    label: string;
-    options?: string[];
-    selected?: string | null;
-    onSelect?: (option: string) => void;
-    onApplyFilter?: () => void;
-    children?: ReactNode;
-}
+import {FilterDropdownProps} from "../../types/types.ts";
+
+
 
 const FilterDropdown: React.FC<FilterDropdownProps> = ({
                                                            label,

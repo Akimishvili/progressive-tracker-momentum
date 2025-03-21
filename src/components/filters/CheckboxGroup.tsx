@@ -1,11 +1,9 @@
 import React from 'react';
 import Form from 'react-bootstrap/Form';
 
-interface CheckboxGroupProps {
-  options: { name: string; surname: string; avatar: string }[] | string[];
-  selected: string[];
-  onChange: (option: string) => void;
-}
+import {CheckboxGroupProps} from "../../types/types.ts";
+
+
 
 const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ options, selected, onChange }) => {
   return (

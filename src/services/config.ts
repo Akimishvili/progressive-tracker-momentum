@@ -45,3 +45,9 @@ export const departmentShortNames: { [key: number]: string } = {
     6: "ინფ. ტექ.",
     7: "მედია"
 };
+
+
+export const georgianMonths = [
+    'იანვ', 'თებ', 'მარტ', 'აპრ', 'მაი', 'ივნ',
+    'ივლ', 'აგვ', 'სექტ', 'ოქტ', 'ნოე', 'დეკ'
+];

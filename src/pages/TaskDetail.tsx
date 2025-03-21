@@ -1,8 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+
 import Container from "react-bootstrap/Container";
 import { Col, Row } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
+import Image from "react-bootstrap/Image";
+import Dropdown from "react-bootstrap/Dropdown";
+
+
+import CommentsSection from "../components/comments/CommentsSection.tsx";
+
 import {
     apiToken,
     baseURL,
@@ -10,25 +17,10 @@ import {
     departmentShortNames,
     priorityColors,
 } from "../services/config.ts";
-import {Status, Task} from "../types/types.ts";
-import Image from "react-bootstrap/Image";
-import CommentsSection from "../components/comments/CommentsSection.tsx";
-import Dropdown from "react-bootstrap/Dropdown";
+import {Status, Task, TaskComment} from "../types/types.ts";
+import {formatDueDateToGeorgian, getColorFromMap} from "../services/helpers.ts";
 
 
-interface TaskCommentReply {
-    author: string;
-    avatar: string;
-    text: string;
-}
-
-interface TaskComment {
-    id: number;
-    author: string;
-    avatar: string;
-    text: string;
-    reply?: TaskCommentReply;
-}
 
 const TaskDetail = () => {
     const { taskId } = useParams<{ taskId: string }>();
@@ -36,7 +28,7 @@ const TaskDetail = () => {
     const [statuses, setStatuses] = useState<Status[]>([]);
     const [selectedStatusId, setSelectedStatusId] = useState<number | null>(null);
     const [comments, setComments] = useState<TaskComment[]>([]);
-
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (taskId) {
@@ -46,9 +38,11 @@ const TaskDetail = () => {
         }
     }, [taskId]);
 
+    // Fetch comments for a task
     const fetchCommentsByTaskId = async (taskId: number) => {
         try {
-            const response = await fetch(`${baseURL}/tasks/${taskId}/comments`, {
+            const response = await fetch([baseURL, "tasks", taskId, "comments"].join("/"), {
+
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -67,10 +61,10 @@ const TaskDetail = () => {
         }
     };
 
-
+    // Fetch statuses for task
     const fetchStatuses = async () => {
         try {
-            const response = await fetch(`${baseURL}/statuses`, {
+            const response = await fetch([baseURL, "statuses"].join("/"), {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -83,17 +77,16 @@ const TaskDetail = () => {
             }
 
             const data = await response.json();
-            console.log("Fetched statuses:", data);
             setStatuses(data);
         } catch (err) {
             console.error("Failed to fetch statuses:", err);
         }
     };
 
-
+    // Fetch a task by ID
     const fetchTaskById = async (id: number) => {
         try {
-            const response = await fetch(`${baseURL}/tasks/${id}`, {
+            const response = await fetch([baseURL, "tasks", id].join("/"), {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -101,25 +94,26 @@ const TaskDetail = () => {
                 },
             });
 
-
             if (!response.ok) {
                 throw new Error(`Failed to fetch task with ID ${id}`);
             }
 
             const fetchedTask: Task = await response.json();
-            console.log("Fetched single task:", fetchedTask);
             setTask(fetchedTask);
             setSelectedStatusId(fetchedTask.status.id);
+            setLoading(false);  // Set loading to false once the task data is fetched
         } catch (err) {
             console.error("Failed to fetch task by ID:", err);
+            setLoading(false);  // Set loading to false even if there is an error
         }
     };
 
+    // Handle status dropdown change
     const handleDropdownChange = async (newStatusId: number) => {
         setSelectedStatusId(newStatusId);
 
         try {
-            const response = await fetch(`${baseURL}/tasks/${taskId}`, {
+            const response = await fetch([baseURL, "tasks", taskId].join("/"), {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -133,24 +127,13 @@ const TaskDetail = () => {
             }
 
             const updatedTask = await response.json();
-            console.log("Updated task:", updatedTask);
             setTask(updatedTask);
         } catch (err) {
             console.error("Error updating task status:", err);
         }
     };
 
-
-
-    useEffect(() => {
-        if (taskId) {
-            fetchTaskById(Number(taskId));
-            fetchStatuses();
-        }
-    }, [taskId]);
-
-
-    if (!task) {
+    if (loading) {
         return (
             <Container>
                 <p>Loading task details...</p>
@@ -158,28 +141,25 @@ const TaskDetail = () => {
         );
     }
 
+    if (!task) {
+        return (
+            <Container>
+                <p>Task not found</p>
+            </Container>
+        );
+    }
+
+
     // Get the priority color from the map
-    const priorityColor = priorityColors[task.priority.id] || '#000'; // Default color if not found
+    const priorityColor = getColorFromMap(priorityColors, task.priority.id.toString());
 
     // Get the department color from the map
-    const departmentColor = departmentColors[task.department.id] || '#000'; // Default color if not found
+    const departmentColor = getColorFromMap(departmentColors, task.department.id.toString());
 
     // Get the department's shortened name from the map
-    const departmentShortName = departmentShortNames[task.department.id] || task.department.name; // Default to full name if not found
+    const departmentShortName = departmentShortNames[task.department.id] || task.department.name;
 
-
-    const georgianWeekdays = ['კვი', 'ორშ', 'სამ', 'ოთხ', 'ხუთ', 'პარ', 'შაბ'];
-
-    const date = new Date(task.due_date);
-    const dayOfWeek = date.getDay();
-    const weekdayGe = georgianWeekdays[dayOfWeek];
-
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1);
-    const year = date.getFullYear();
-
-    const formattedDate = `${weekdayGe} - ${day}/${month}/${year}`;
-
+    const formattedDate = formatDueDateToGeorgian(task.due_date);
 
     return (
         <Container>

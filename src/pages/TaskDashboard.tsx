@@ -1,68 +1,66 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Col, Row, Badge, Button, Container } from "react-bootstrap";
+
 import FilterWrapper from "../components/filters/FilterWrapper.tsx";
 import TaskList from "../components/tasks/TaskList.tsx";
 
-const TaskDashboard = () => {
-    const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
-    const [selectedPriorities, setSelectedPriorities] = useState<string[]>([]);
-    const [selectedEmployee, setSelectedEmployee] = useState<string | null>(null);
+import useFilters from "../hooks/useFilters.ts";
 
+const TaskDashboard = () => {
+    const {
+        tempDepartments,
+        tempPriorities,
+        tempEmployee,
+    } = useFilters();
+
+    const [selectedDepartments, setSelectedDepartments] = useState<string[]>(tempDepartments);
+    const [selectedPriorities, setSelectedPriorities] = useState<string[]>(tempPriorities);
+    const [selectedEmployee, setSelectedEmployee] = useState<string | null>(tempEmployee);
 
     useEffect(() => {
-        const savedDepartments = localStorage.getItem("selectedDepartments");
-        const savedPriorities = localStorage.getItem("selectedPriorities");
-        const savedEmployee = localStorage.getItem("selectedEmployee");
+        setSelectedDepartments(tempDepartments);
+        setSelectedPriorities(tempPriorities);
+        setSelectedEmployee(tempEmployee);
+    }, [tempDepartments, tempPriorities, tempEmployee]);
 
-        if (savedDepartments) {
-            setSelectedDepartments(JSON.parse(savedDepartments));
-        }
-        if (savedPriorities) {
-            setSelectedPriorities(JSON.parse(savedPriorities));
-        }
-        if (savedEmployee) {
-            setSelectedEmployee(savedEmployee);
-        }
-    }, []);
+    const handleRemoveDepartment = useCallback(
+        (department: string) => {
+            const newDepartments = selectedDepartments.filter((dep) => dep !== department);
+            setSelectedDepartments(newDepartments);
+            localStorage.setItem("selectedDepartments", JSON.stringify(newDepartments));
+        },
+        [selectedDepartments]
+    );
 
-    const handleRemoveDepartment = (department: string) => {
-        const newDepartments = selectedDepartments.filter((dep) => dep !== department);
-        setSelectedDepartments(newDepartments);
-        localStorage.setItem("selectedDepartments", JSON.stringify(newDepartments));
-    };
+    const handleRemovePriority = useCallback(
+        (priority: string) => {
+            const newPriorities = selectedPriorities.filter((pri) => pri !== priority);
+            setSelectedPriorities(newPriorities);
+            localStorage.setItem("selectedPriorities", JSON.stringify(newPriorities));
+        },
+        [selectedPriorities]
+    );
 
-    const handleRemovePriority = (priority: string) => {
-        const newPriorities = selectedPriorities.filter((pri) => pri !== priority);
-        setSelectedPriorities(newPriorities);
-        localStorage.setItem("selectedPriorities", JSON.stringify(newPriorities));
-    };
-
-    const handleRemoveEmployee = () => {
+    const handleRemoveEmployee = useCallback(() => {
         setSelectedEmployee(null);
         localStorage.removeItem("selectedEmployee");
-    };
+    }, []);
 
     const handleClearAllFilters = () => {
         setSelectedDepartments([]);
         setSelectedPriorities([]);
         setSelectedEmployee(null);
-
-        // Clear localStorage
         localStorage.removeItem("selectedDepartments");
         localStorage.removeItem("selectedPriorities");
         localStorage.removeItem("selectedEmployee");
-    };
+    }
 
-    const hasFilters =
-        selectedDepartments.length > 0 ||
-        selectedPriorities.length > 0 ||
-        selectedEmployee !== null;
+    const hasFilters = selectedDepartments.length > 0 || selectedPriorities.length > 0 || selectedEmployee !== null;
 
     const activeFilters = [
         ...selectedDepartments.map((dep) => ({
             label: dep,
             onRemove: () => handleRemoveDepartment(dep),
-            color: "primary",
         })),
         ...selectedPriorities.map((pri) => ({
             label: pri,
@@ -78,15 +76,6 @@ const TaskDashboard = () => {
             : []),
     ];
 
-    useEffect(() => {
-        return () => {
-
-            localStorage.removeItem("selectedDepartments");
-            localStorage.removeItem("selectedPriorities");
-            localStorage.removeItem("selectedEmployee");
-        };
-    }, []);
-
     return (
         <Container className="py-4">
             <Row>
@@ -98,11 +87,6 @@ const TaskDashboard = () => {
             <Row className="pb-4 px-0">
                 <Col>
                     <FilterWrapper
-                        key={
-                            selectedDepartments.join(",") +
-                            selectedPriorities.join(",") +
-                            (selectedEmployee ?? "")
-                        }
                         selectedDepartments={selectedDepartments}
                         setSelectedDepartments={setSelectedDepartments}
                         selectedPriorities={selectedPriorities}
@@ -113,16 +97,12 @@ const TaskDashboard = () => {
                 </Col>
             </Row>
 
-            {/* Filter Chips Section */}
             {hasFilters && (
                 <Row className="mb-4">
                     <Col className="p-0">
                         <div className="d-flex flex-wrap gap-2 align-items-center">
                             {activeFilters.map((filter, index) => (
-                                <Badge
-                                    key={index}
-                                    className={"d-flex align-items-center gap-2 p-2 filtered-btn"}
-                                >
+                                <Badge key={index} className="d-flex align-items-center gap-2 p-2 filtered-btn">
                                     {filter.label}
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -147,7 +127,6 @@ const TaskDashboard = () => {
                 </Row>
             )}
 
-            {/* Task List */}
             <Row className="gap-4 mt-5">
                 <TaskList
                     selectedDepartments={selectedDepartments}

@@ -1,40 +1,39 @@
+import { Link } from 'react-router-dom';
+
 import Card from 'react-bootstrap/Card';
 import { Col, Row } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
-import { Task } from "../../types/types.ts";
-import { departmentColors, departmentShortNames, priorityColors, statusColors } from "../../services/config.ts";
 import Image from "react-bootstrap/Image";
-import { Link } from 'react-router-dom'; // Import Link
 
+import { departmentColors, departmentShortNames, priorityColors, statusColors } from "../../services/config.ts";
+import {formatGeorgianDate, getColorFromMap, truncateDescription} from "../../services/helpers.ts";
+import { Task } from "../../types/types.ts"
+
+    ;
 const TaskCard = ({ task }: { task: Task }) => {
+
     // Get the status color from the map based on task.status.id
-    const statusColor = statusColors[task.status.id] || '#000'; // Default color if not found
+    const statusColor = getColorFromMap(statusColors, task.status.id.toString());
 
     // Get the priority color from the map
-    const priorityColor = priorityColors[task.priority.id] || '#000'; // Default color if not found
+    const priorityColor = getColorFromMap(priorityColors, task.priority.id.toString());
 
     // Get the department color from the map
-    const departmentColor = departmentColors[task.department.id] || '#000'; // Default color if not found
+    const departmentColor = getColorFromMap(departmentColors, task.department.id.toString());
 
     // Get the department's shortened name from the map
-    const departmentShortName = departmentShortNames[task.department.id] || task.department.name; // Default to full name if not found
+    const departmentShortName = departmentShortNames[task.department.id] || task.department.name;
 
-    const georgianMonths = [
-        'იანვ', 'თებ', 'მარტ', 'აპრ', 'მაი', 'ივნ',
-        'ივლ', 'აგვ', 'სექტ', 'ოქტ', 'ნოე', 'დეკ'
-    ];
+    // Format the due date using the helper function
+    const formattedDate = formatGeorgianDate(task.due_date);
 
-    const formattedDueDate = new Date(task.due_date);
-    const day = formattedDueDate.getDate();
-    const month = formattedDueDate.getMonth();
-    const year = formattedDueDate.getFullYear();
-    const formattedDate = `${day} ${georgianMonths[month]}, ${year}`;
-
-    const description = task.description.length > 1000 ? task.description.slice(0, 1000) + '...' : task.description;
+    // Truncate the description using the helper function
+    const description = truncateDescription(task.description);
 
     return (
         <Link to={`/tasks/${task.id}`} style={{ textDecoration: 'none' }}>
             <Card style={{ borderColor: statusColor, padding: 20, marginBottom: 20 }}>
+
                 <Card.Header className="task-card-header">
                     <Row className="align-items-center justify-content-between g-0 px-0">
                         <Col xs={12} md={8} className="d-flex align-items-center flex-lg-nowrap gap-2 ">
@@ -74,6 +73,7 @@ const TaskCard = ({ task }: { task: Task }) => {
                     <Card.Title className="task-card-title">{task.name}</Card.Title>
                     <Card.Text>{description}</Card.Text>
                 </Card.Body>
+
                 <Card.Footer className='task-card-footer'>
                     <Row className="align-items-center">
                         <Col>

@@ -1,10 +1,8 @@
 import React from 'react';
 import Button from 'react-bootstrap/Button';
 
-interface FilterButtonProps {
-    label: string;
-    onClick: () => void;
-}
+import {FilterButtonProps} from "../../types/types.ts";
+
 
 const FilterButton: React.FC<FilterButtonProps> = ({ label, onClick }) => {
     return (

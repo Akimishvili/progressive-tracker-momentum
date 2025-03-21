@@ -9,7 +9,7 @@ import logo from '../assets/logo.png';
 import AddEmployeeModal from './employes/AddEmployModal.tsx';
 
 const Header = () => {
-  const [showModal, setShowModal] = useState(false); // 👈 modal state
+  const [showModal, setShowModal] = useState(false);
 
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
