@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import { Col, Row } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
-import Form from 'react-bootstrap/Form';
 import {
     apiToken,
     baseURL,
@@ -11,15 +10,87 @@ import {
     departmentShortNames,
     priorityColors,
 } from "../services/config.ts";
-import { Task } from "../types/types.ts";
+import {Status, Task} from "../types/types.ts";
 import Image from "react-bootstrap/Image";
 import CommentsSection from "../components/comments/CommentsSection.tsx";
+import Dropdown from "react-bootstrap/Dropdown";
+
+
+interface TaskCommentReply {
+    author: string;
+    avatar: string;
+    text: string;
+}
+
+interface TaskComment {
+    id: number;
+    author: string;
+    avatar: string;
+    text: string;
+    reply?: TaskCommentReply;
+}
 
 const TaskDetail = () => {
-    const { taskId } = useParams();
+    const { taskId } = useParams<{ taskId: string }>();
     const [task, setTask] = useState<Task | null>(null);
+    const [statuses, setStatuses] = useState<Status[]>([]);
+    const [selectedStatusId, setSelectedStatusId] = useState<number | null>(null);
+    const [comments, setComments] = useState<TaskComment[]>([]);
 
-    console.log(taskId)
+
+    useEffect(() => {
+        if (taskId) {
+            fetchTaskById(Number(taskId));
+            fetchStatuses();
+            fetchCommentsByTaskId(Number(taskId));
+        }
+    }, [taskId]);
+
+    const fetchCommentsByTaskId = async (taskId: number) => {
+        try {
+            const response = await fetch(`${baseURL}/tasks/${taskId}/comments`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${apiToken}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch comments");
+            }
+
+            const commentsData: TaskComment[] = await response.json();
+            setComments(commentsData);
+        } catch (err) {
+            console.error("Failed to fetch comments:", err);
+        }
+    };
+
+
+    const fetchStatuses = async () => {
+        try {
+            const response = await fetch(`${baseURL}/statuses`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${apiToken}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch statuses");
+            }
+
+            const data = await response.json();
+            console.log("Fetched statuses:", data);
+            setStatuses(data);
+        } catch (err) {
+            console.error("Failed to fetch statuses:", err);
+        }
+    };
+
+
     const fetchTaskById = async (id: number) => {
         try {
             const response = await fetch(`${baseURL}/tasks/${id}`, {
@@ -38,18 +109,47 @@ const TaskDetail = () => {
             const fetchedTask: Task = await response.json();
             console.log("Fetched single task:", fetchedTask);
             setTask(fetchedTask);
+            setSelectedStatusId(fetchedTask.status.id);
         } catch (err) {
             console.error("Failed to fetch task by ID:", err);
         }
     };
 
+    const handleDropdownChange = async (newStatusId: number) => {
+        setSelectedStatusId(newStatusId);
+
+        try {
+            const response = await fetch(`${baseURL}/tasks/${taskId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${apiToken}`,
+                },
+                body: JSON.stringify({ status_id: newStatusId }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to update task status");
+            }
+
+            const updatedTask = await response.json();
+            console.log("Updated task:", updatedTask);
+            setTask(updatedTask);
+        } catch (err) {
+            console.error("Error updating task status:", err);
+        }
+    };
+
+
+
     useEffect(() => {
         if (taskId) {
             fetchTaskById(Number(taskId));
+            fetchStatuses();
         }
     }, [taskId]);
 
-    // If no task yet, show loading
+
     if (!task) {
         return (
             <Container>
@@ -68,13 +168,26 @@ const TaskDetail = () => {
     const departmentShortName = departmentShortNames[task.department.id] || task.department.name; // Default to full name if not found
 
 
+    const georgianWeekdays = ['კვი', 'ორშ', 'სამ', 'ოთხ', 'ხუთ', 'პარ', 'შაბ'];
+
+    const date = new Date(task.due_date);
+    const dayOfWeek = date.getDay();
+    const weekdayGe = georgianWeekdays[dayOfWeek];
+
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1);
+    const year = date.getFullYear();
+
+    const formattedDate = `${weekdayGe} - ${day}/${month}/${year}`;
+
+
     return (
         <Container>
             <Row className="align-items-center pt-4 ps-2">
-                <Col className="p-0 col-1">
+                <Col className="p-0" lg={1} xs={2}>
                       <span>
                         <Button
-                            className="level-btn"
+                            className="level-btn pe-none"
                             style={{
                                 "--bs-btn-border-color": priorityColor,
                                 color: priorityColor,
@@ -89,10 +202,10 @@ const TaskDetail = () => {
                         </Button>
                       </span>
                 </Col>
-                <Col className="p-0 col-1">
+                <Col className="p-0" lg={1} xs={2}>
                   <span>
                     <Button
-                        className="department-btn"
+                        className="department-btn pe-none"
                         style={{
                             backgroundColor: departmentColor,
                             borderColor: departmentColor,
@@ -105,7 +218,7 @@ const TaskDetail = () => {
             </Row>
 
             <Row className="pt-2">
-                <Col className="d-flex flex-column gap-4">
+                <Col className="d-flex flex-column gap-4" xs={12} lg={6}>
                     <Row>
                         <h3 className="detail-page-title">{task.name}</h3>
                         <p className="detail-page-desc">{task.description}</p>
@@ -113,8 +226,8 @@ const TaskDetail = () => {
                     <h4 className="detail-page-subtitle">
                         დავალების დეტალები
                     </h4>
-                   <Container className="d-flex flex-column gap-4">
-                       <Row>
+                   <Container className="d-flex flex-column gap-5">
+                       <Row className="align-items-center">
                            <Col className="p-0 col-4">
                                <div className="d-flex align-items-center gap-2">
                                    <span>
@@ -127,15 +240,35 @@ const TaskDetail = () => {
                                        სტატუსი
                                    </span>
                                </div>
-
                            </Col>
                            <Col className="p-0 col-5">
-                               <Form.Select>
-                                   <option>მზად ტესტირებისთვის</option>
-                               </Form.Select>
+                               <Dropdown>
+                                   <Dropdown.Toggle
+                                       variant="light"
+                                       id="dropdown-basic"
+                                       className="custom-dropdown w-100"
+                                   >
+                                       {statuses.find(status => status.id === selectedStatusId)?.name || 'სტატუსის არჩევა'}
+                                   </Dropdown.Toggle>
+
+                                   <Dropdown.Menu>
+                                       {statuses.map((status: Status) => (
+                                           <Dropdown.Item
+                                               className="custom-dropdown-item"
+                                               key={status.id}
+                                               active={status.id === selectedStatusId}
+                                               onClick={() => handleDropdownChange(status.id)}
+                                           >
+                                               {status.name}
+                                           </Dropdown.Item>
+                                       ))}
+                                   </Dropdown.Menu>
+                               </Dropdown>
+
                            </Col>
+
                        </Row>
-                       <Row>
+                       <Row className="align-items-center">
                            <Col className="p-0 col-4">
                                <div className="d-flex align-items-center gap-2">
                                    <span>
@@ -152,16 +285,16 @@ const TaskDetail = () => {
                            <Col className="p-0 col-5">
                                 <Row className="align-items-center position-relative">
                                     <Col className="col-2">
-                                        <Image className="detail-page-icon" src={"https://s3-alpha-sig.figma.com/img/567a/0043/b9f41937d4070d3b0d68c13a95d14ed0?Expires=1742774400&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=R~DUXa9cx8Ii11EPdLAQppjGziRTVMKuaz9zpqqfBXRndCB63jzW4drh6kCyOEzNhonNKZ6ZhzVpIrww8-Ep3vpvoTxQE4T38Zg42DAXaiWff9Jdl9zmrj0cT-yf8SlDRa4qk-mSJtKuWzCZ0EdQfnsoUL9bvOBomxHMRWLJqtNO2sU3NGsEhcdXlQ7~mU~f8jSRCZeuzOgd9Fs0TvHiqCX4zB3VIJVVQUQum~fDJjvcUDZkG4fuDFaosI7RZJPMsYkRXaX-1QMv3~mqPOyzS-t~ee~V9ymNygE1DZk~5NILoiOz3y4GH03XTgzIwPr0m3VjBj2kTm9GCRo2FkeALA__"} />
+                                        <Image className="detail-page-icon" src={task.employee.avatar} />
                                     </Col>
                                     <Col>
-                                        <span className="detail-page-employ-dep">დიზაინის დეპარტამენტი</span>
-                                        <span className="detail-page-span-text">ელაია ბაგრატიონი</span>
+                                        <span className="detail-page-employ-dep">{task.department.name}</span>
+                                        <span className="detail-page-span-text">{task.employee.name} {task.employee.surname}</span>
                                     </Col>
                                 </Row>
                            </Col>
                        </Row>
-                       <Row>
+                       <Row className="align-items-center">
                            <Col className="p-0 col-4">
                                <div className="d-flex align-items-center gap-2">
                                     <span>
@@ -179,14 +312,14 @@ const TaskDetail = () => {
                            </Col>
                            <Col className="col-5">
                                 <span className="detail-page-span-text">
-                                    ორშ - 02/2/2025
+                                    {formattedDate}
                                 </span>
                            </Col>
                        </Row>
                    </Container>
                 </Col>
-                <Col>
-                   <CommentsSection />
+                <Col className="mt-5 mt-lg-0" xs={12} lg={6}>
+                    <CommentsSection comments={comments} taskId={taskId ?? ''} />
                 </Col>
             </Row>
         </Container>

@@ -189,7 +189,7 @@
   line-height: 100%;
   letter-spacing: 0;
   position: absolute;
-  top: 0;
+  top: -5px;
 }
 
 .comments-container{
@@ -203,6 +203,12 @@
   border-radius: 10px;
   padding-top: 20px;
 }
+
+.form-control:focus{
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 .add-comment-input::placeholder{
   color: #898989;
   font-size: 14px;
@@ -223,8 +229,12 @@
   color: #FFFFFF;
   font-weight: 400;
 }
+.comment-btn:hover{
+  background-color: #B588F4 !important;
+  border: 0.5px solid #B588F4 !important;
+  color: #FFFFFF !important;
+}
 .comment-count-btn{
-  padding: 10px;
   border-radius: 30px;
   background-color: #8338EC;
   border: 0.5px solid #8338EC;
@@ -247,8 +257,12 @@
   letter-spacing: 0;
   font-family: 'FiraGO';
   text-decoration: none;
+  border: none !important;
+  font-weight: 700;
 }
-
+.answer-btn:hover{
+  color: #B588F4 !important;
+}
 .create-task-form-container{
   border: 0.3px solid #DDD2FF;
   background-color: #FBF9FFA6;
@@ -395,4 +409,23 @@
 .custom-checkbox .form-check-input:checked[type=checkbox] {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%238338EC' d='M13.485 1.929a1 1 0 0 1 0 1.414l-7.071 7.071a1 1 0 0 1-1.414 0L2.515 7.071a1 1 0 1 1 1.414-1.414L6 7.727l6.071-6.071a1 1 0 0 1 1.414 0z'/%3E%3C/svg%3E");
   background-size: 100% 100%;
+}
+
+.cancel-btn{
+  border: none;
+  background-color: transparent;
+  color: #ADB5BD;
+}
+
+.custom-dropdown{
+  background-color: transparent;
+  border: 1px solid #CED4DA;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: "FiraGO";
+  color: #0D0F10;
+}
+
+.custom-dropdown-item:active, .custom-dropdown-item.active{
+  --bs-dropdown-link-active-bg: #8338EC !important;
 }
